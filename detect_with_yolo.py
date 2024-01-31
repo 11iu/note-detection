@@ -4,8 +4,11 @@ from ultralytics import YOLO
 model = YOLO('note-model.pt')
 
 # Run inference on an image
-results = model('notes/note3.jpg')  # results list
+results = model('notes/note3.jpg')
 
-# View results
+# Show the bounding boxes overlayed and save
+#results = model.predict('notes/note3.jpg', show=True, conf=0.5, save=True)
+
+# print the Boxes object containing the detection bounding boxes
 for r in results:
-    print(r.boxes)  # print the Boxes object containing the detection bounding boxes
+    print(r.boxes)  
