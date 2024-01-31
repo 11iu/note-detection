@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import platform
+import argparse
 from rknnlite.api import RKNNLite
 
 # decice tree for RK356x/RK3588
@@ -172,6 +173,10 @@ def post_process(input_data):
 
 if __name__ == '__main__':
 
+    parser = argparse.ArgumentParser(description='Detect notes on an image')
+    parser.add_argument('input_file', help='Path of input image')
+    args = parser.parse_args()  
+
     # Get device information
     host_name = get_host()
     if host_name == 'RK3588':
@@ -191,7 +196,7 @@ if __name__ == '__main__':
     print('done')
 
     # preprocessing
-    ori_img = cv2.imread('./note3.jpg')
+    ori_img = cv2.imread(args.input_file)
     img = cv2.cvtColor(ori_img, cv2.COLOR_BGR2RGB)
     img = cv2.resize(img, (640, 640))
     img = np.expand_dims(img, 0)
