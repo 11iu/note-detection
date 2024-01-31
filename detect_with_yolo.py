@@ -4,7 +4,7 @@ from ultralytics import YOLO
 model = YOLO('note-model.pt')
 
 # Run inference on an image
-results = model('note3.jpg')  # results list
+results = model('notes/note3.jpg')  # results list
 
 # View results
 for r in results:

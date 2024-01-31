@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import platform
-import argparse
 from rknnlite.api import RKNNLite
 
 # decice tree for RK356x/RK3588
@@ -171,12 +170,11 @@ def post_process(input_data):
     return boxes, classes, scores
 
 
+
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='Detect notes on an image')
-    parser.add_argument('input_file', help='Path of input image')
-    args = parser.parse_args()  
-
+    cam = cv2.VideoCapture(0)
+    
     # Get device information
     host_name = get_host()
     if host_name == 'RK3588':
@@ -195,12 +193,6 @@ if __name__ == '__main__':
         exit(ret)
     print('done')
 
-    # preprocessing
-    ori_img = cv2.imread(args.input_file)
-    img = cv2.cvtColor(ori_img, cv2.COLOR_BGR2RGB)
-    img = cv2.resize(img, IMG_SIZE)
-    img = np.expand_dims(img, 0)
-
     # Init runtime environment
     print('--> Init runtime environment')
     # run on RK356x/RK3588 with Debian OS, do not need specify target.
@@ -214,17 +206,28 @@ if __name__ == '__main__':
         exit(ret)
     print('done')
 
-    # Inference
-    print('--> Running model')
-    outputs = rknn_lite.inference(inputs=[img])
+    while True:
+        # preprocessing and capturing image with cam
+        ret, frame = cam.read()
+        img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        img = cv2.resize(img, IMG_SIZE)
+        img = np.expand_dims(img, 0)
 
-    # Show the classification results
-    boxes, classes, scores = post_process(outputs)
+        # Inference
+        print('--> Running model')
+        outputs = rknn_lite.inference(inputs=[img])
 
-    for box, score, cl in zip(boxes, scores, classes):
-        top, left, right, bottom = [int(_b) for _b in box]
-        print("%s @ (%d %d %d %d) %f" % (CLASSES[cl], top, left, right, bottom, score))
+        # Show the classification results
+        boxes, classes, scores = post_process(outputs)
 
+        for box, score, cl in zip(boxes, scores, classes):
+            top, left, right, bottom = [int(_b) for _b in box]
+            print("%s @ (%d %d %d %d) %f" % (CLASSES[cl], top, left, right, bottom, score))
 
-    print('done')
+        # Break the loop if 'q' key is pressed
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    
+    cam.release()
     rknn_lite.release()
+    print('done')
