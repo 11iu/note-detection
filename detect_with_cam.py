@@ -173,13 +173,11 @@ def post_process(input_data):
 def draw(image, boxes, scores, classes):
     
     for box, score, cl in zip(boxes, scores, classes):
-        top, left, right, bottom = box
+        top, left, right, bottom = [int(_b) for _b in box]
         # print('class: {}, score: {}'.format(CLASSES[cl], score))
         # print('box coordinate left,top,right,down: [{}, {}, {}, {}]'.format(top, left, right, bottom))
-        top = int(top)
-        left = int(left)
 
-        cv2.rectangle(image, (top, left), (int(right), int(bottom)), (255, 0, 0), 2)
+        cv2.rectangle(image, (left, top), (right, bottom), (255, 0, 0), 2)
         cv2.putText(image, '{0} {1:.2f}'.format(CLASSES[cl], score),
                     (top, left - 6),
                     cv2.FONT_HERSHEY_SIMPLEX,
@@ -250,6 +248,7 @@ if __name__ == '__main__':
         if boxes is not None:
             draw(img, boxes, scores, classes)
             cv2.imwrite("output_image.jpg", cv2.cvtColor(img[0], cv2.COLOR_RGB2BGR))
+            break
 
         print("FPS: ", 1.0 / (time.time() - start_time))
 
