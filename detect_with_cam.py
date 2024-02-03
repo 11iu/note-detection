@@ -31,8 +31,6 @@ def get_host():
         host = os_machine
     return host
 
-INPUT_SIZE = 224
-
 RK3588_RKNN_MODEL = 'models/note-model.rknn'
 
 IMG_SIZE = (640, 640)
@@ -195,6 +193,9 @@ def print_outputs(boxes, classes, scores):
 if __name__ == '__main__':
 
     cam = cv2.VideoCapture(0)
+    # choose codec according to format needed
+    fourcc = cv2.VideoWriter_fourcc(*'MP4V') 
+    video = cv2.VideoWriter('video.mp4', fourcc, 24, IMG_SIZE)
     
     # Get device information
     host_name = get_host()
@@ -247,10 +248,10 @@ if __name__ == '__main__':
         boxes, classes, scores = post_process(outputs)
         print_outputs(boxes, classes, scores)
 
-        # if boxes is not None:
-        #     draw(img[0], boxes, scores, classes)
-        #     cv2.imwrite("output_image.jpg", cv2.cvtColor(img[0], cv2.COLOR_RGB2BGR))
-        #     break
+        if boxes is not None:
+            draw(img[0], boxes, scores, classes)
+            video.write(cv2.cvtColor(img[0], cv2.COLOR_RGB2BGR))
+            #cv2.imwrite("output_image.jpg", cv2.cvtColor(img[0], cv2.COLOR_RGB2BGR))
 
         # calculate average fps every 30 frames
         if frames % 30 == 0:
@@ -267,5 +268,6 @@ if __name__ == '__main__':
     print(f"Overall fps: {fps: .3f}")
     
     cam.release()
+    video.release()
     rknn_lite.release()
     print('done')
