@@ -33,7 +33,7 @@ def get_host():
 
 INPUT_SIZE = 224
 
-RK3588_RKNN_MODEL = 'note-model.rknn'
+RK3588_RKNN_MODEL = 'models/note-model.rknn'
 
 IMG_SIZE = (640, 640)
 OBJ_THRESH = 0.25

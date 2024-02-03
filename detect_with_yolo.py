@@ -1,7 +1,7 @@
 from ultralytics import YOLO
 
 # Load a pretrained YOLOv8n model
-model = YOLO('note-model.onnx')
+model = YOLO('models/note-model.onnx')
 
 # Run inference on an image
 #results = model('notes/note4.jpg')

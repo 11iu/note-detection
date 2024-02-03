@@ -1,43 +1,9 @@
 import cv2
 import numpy as np
-import platform
-import time
-from rknnlite.api import RKNNLite
 
-# decice tree for RK356x/RK3588
-DEVICE_COMPATIBLE_NODE = '/proc/device-tree/compatible'
-
-CLASSES = ("note", "robot")
-
-def get_host():
-    # get platform and device type
-    system = platform.system()
-    machine = platform.machine()
-    os_machine = system + '-' + machine
-    if os_machine == 'Linux-aarch64':
-        try:
-            with open(DEVICE_COMPATIBLE_NODE) as f:
-                device_compatible_str = f.read()
-                if 'rk3588' in device_compatible_str:
-                    host = 'RK3588'
-                elif 'rk3562' in device_compatible_str:
-                    host = 'RK3562'
-                else:
-                    host = 'RK3566_RK3568'
-        except IOError:
-            print('Read device node {} failed.'.format(DEVICE_COMPATIBLE_NODE))
-            exit(-1)
-    else:
-        host = os_machine
-    return host
-
-INPUT_SIZE = 224
-
-RK3588_RKNN_MODEL = 'models/note-model.rknn'
-
-IMG_SIZE = (640, 640)
 OBJ_THRESH = 0.25
 NMS_THRESH = 0.45
+IMG_SIZE = (640, 640)
 
 def filter_boxes(boxes, box_confidences, box_class_probs):
     """Filter boxes with object threshold.
@@ -170,75 +136,14 @@ def post_process(input_data):
 
     return boxes, classes, scores
 
-def print_outputs(boxes, classes, scores):
-    
-    if boxes is not None:
-        for box, score, cl in zip(boxes, scores, classes):
-            top, left, right, bottom = [int(_b) for _b in box]
-            print("%s @ (%d %d %d %d) %f" % (CLASSES[cl], top, left, right, bottom, score))
-    else:
-        print("No notes detected")
+def myFunc(rknn_lite, img):
+    # preprocessing
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    img = cv2.resize(img, IMG_SIZE)
+    img = np.expand_dims(img, 0)
 
+    outputs = rknn_lite.inference(inputs=[img])
 
-if __name__ == '__main__':
-
-    cam = cv2.VideoCapture(0)
-    
-    # Get device information
-    host_name = get_host()
-    if host_name == 'RK3588':
-        rknn_model = RK3588_RKNN_MODEL
-    else:
-        print("This demo cannot run on the current platform: {}".format(host_name))
-        exit(-1)
-
-    rknn_lite = RKNNLite()
-
-    # Load RKNN model
-    print('--> Load RKNN model')
-    ret = rknn_lite.load_rknn(rknn_model)
-    if ret != 0:
-        print('Load RKNN model failed')
-        exit(ret)
-    print('done')
-
-    # Init runtime environment
-    print('--> Init runtime environment')
-    # run on RK356x/RK3588 with Debian OS, do not need specify target.
-    if host_name == 'RK3588':
-        # For RK3588, specify which NPU core the model runs on through the core_mask parameter.
-        ret = rknn_lite.init_runtime(core_mask=RKNNLite.NPU_CORE_0)
-    else:
-        ret = rknn_lite.init_runtime()
-    if ret != 0:
-        print('Init runtime environment failed')
-        exit(ret)
-    print('done')
-
-    print('--> Running model')
-
-    while True:
-        start_time = time.time()
-
-        # preprocessing and capturing image with cam
-        ret, frame = cam.read()
-        img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        img = cv2.resize(img, IMG_SIZE)
-        img = np.expand_dims(img, 0)
-
-        # Inference
-        outputs = rknn_lite.inference(inputs=[img])
-
-        # Show the classification results
-        boxes, classes, scores = post_process(outputs)
-        print_outputs(boxes, classes, scores)
-
-        print("FPS: ", 1.0 / (time.time() - start_time))
-
-        # Break the loop if 'q' key is pressed
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-    
-    cam.release()
-    rknn_lite.release()
-    print('done')
+    # postprocessing
+    boxes, classes, scores = post_process(outputs)
+    return (boxes, classes, scores)
