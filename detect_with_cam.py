@@ -170,8 +170,22 @@ def post_process(input_data):
 
     return boxes, classes, scores
 
-def print_outputs(boxes, classes, scores):
+def draw(image, boxes, scores, classes):
     
+    for box, score, cl in zip(boxes, scores, classes):
+        top, left, right, bottom = box
+        # print('class: {}, score: {}'.format(CLASSES[cl], score))
+        # print('box coordinate left,top,right,down: [{}, {}, {}, {}]'.format(top, left, right, bottom))
+        top = int(top)
+        left = int(left)
+
+        cv2.rectangle(image, (top, left), (int(right), int(bottom)), (255, 0, 0), 2)
+        cv2.putText(image, '{0} {1:.2f}'.format(CLASSES[cl], score),
+                    (top, left - 6),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.6, (0, 0, 255), 2)
+
+def print_outputs(boxes, classes, scores):
     if boxes is not None:
         for box, score, cl in zip(boxes, scores, classes):
             top, left, right, bottom = [int(_b) for _b in box]
@@ -232,6 +246,10 @@ if __name__ == '__main__':
         # Show the classification results
         boxes, classes, scores = post_process(outputs)
         print_outputs(boxes, classes, scores)
+
+        if boxes is not None:
+            draw(img, boxes, scores, classes)
+            cv2.imwrite("output_image.jpg", cv2.cvtColor(img[0], cv2.COLOR_RGB2BGR))
 
         print("FPS: ", 1.0 / (time.time() - start_time))
 
