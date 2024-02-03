@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import platform
+import time
 from rknnlite.api import RKNNLite
 
 # decice tree for RK356x/RK3588
@@ -217,7 +218,8 @@ if __name__ == '__main__':
     print('--> Running model')
 
     while True:
-        
+        start_time = time.time()
+
         # preprocessing and capturing image with cam
         ret, frame = cam.read()
         img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -230,6 +232,8 @@ if __name__ == '__main__':
         # Show the classification results
         boxes, classes, scores = post_process(outputs)
         print_outputs(boxes, classes, scores)
+
+        print("FPS: ", 1.0 / (time.time() - start_time))
 
         # Break the loop if 'q' key is pressed
         if cv2.waitKey(1) & 0xFF == ord('q'):
