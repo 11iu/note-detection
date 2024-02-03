@@ -229,8 +229,10 @@ if __name__ == '__main__':
 
     print('--> Running model')
 
+    frames, loopTime, initTime = 0, time.time(), time.time()
+
     while True:
-        start_time = time.time()
+        frames += 1
 
         # preprocessing and capturing image with cam
         ret, frame = cam.read()
@@ -245,16 +247,24 @@ if __name__ == '__main__':
         boxes, classes, scores = post_process(outputs)
         print_outputs(boxes, classes, scores)
 
-        if boxes is not None:
-            draw(img[0], boxes, scores, classes)
-            cv2.imwrite("output_image.jpg", cv2.cvtColor(img[0], cv2.COLOR_RGB2BGR))
+        # if boxes is not None:
+        #     draw(img[0], boxes, scores, classes)
+        #     cv2.imwrite("output_image.jpg", cv2.cvtColor(img[0], cv2.COLOR_RGB2BGR))
+        #     break
+
+        # calculate average fps every 30 frames
+        if frames % 30 == 0:
+            fps = 30 / (time.time() - loopTime)
+            print(f"FPS: {fps: .3f}")
+            loopTime = time.time()
+
+        # stop condition
+        if frames > 300:
             break
 
-        print("FPS: ", 1.0 / (time.time() - start_time))
-
-        # Break the loop if 'q' key is pressed
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+    # Overall average fps
+    fps = frames / (time.time() - initTime)
+    print(f"Overall fps: {fps: .3f}")
     
     cam.release()
     rknn_lite.release()

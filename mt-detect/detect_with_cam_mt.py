@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import time
-from multithreading.rknnpool import rknnPoolExecutor
+from rknnpool import rknnPoolExecutor
 from func import myFunc
 
 # decice tree for RK356x/RK3588
@@ -12,7 +12,7 @@ INPUT_SIZE = 224
 
 RK3588_RKNN_MODEL = '../models/note-model.rknn'
 
-TPEs = 3
+TPEs = 6
 
 def print_outputs(boxes, classes, scores):
     
@@ -56,9 +56,10 @@ if __name__ == '__main__':
         if flag == False:
             break
 
-        print_outputs(data)
+        print_outputs(data[0], data[1], data[2])
         
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        # exit condition
+        if frames > 300:
             break
 
         # calculate average fps every 30 frames

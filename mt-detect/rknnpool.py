@@ -25,7 +25,7 @@ def initRKNN(rknnModel="../models/note-model.rknn", id=0):
     return rknn_lite
 
 
-def initRKNNs(rknnModel="../models/note-model.rknn", TPEs=1):
+def initRKNNs(rknnModel="../models/note-model.rknn", TPEs=3):
     rknn_list = []
     for i in range(TPEs):
         rknn_list.append(initRKNN(rknnModel, i % 3))
