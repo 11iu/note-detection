@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import platform
 import time
 from multithreading.rknnpool import rknnPoolExecutor
 from func import myFunc

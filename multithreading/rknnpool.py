@@ -2,7 +2,6 @@ from queue import Queue
 from rknnlite.api import RKNNLite
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-
 def initRKNN(rknnModel="../models/note-model.rknn", id=0):
     rknn_lite = RKNNLite()
     ret = rknn_lite.load_rknn(rknnModel)
