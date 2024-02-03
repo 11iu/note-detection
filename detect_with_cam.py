@@ -169,6 +169,14 @@ def post_process(input_data):
 
     return boxes, classes, scores
 
+def print_outputs(boxes, classes, scores):
+    
+    if boxes is not None:
+        for box, score, cl in zip(boxes, scores, classes):
+            top, left, right, bottom = [int(_b) for _b in box]
+            print("%s @ (%d %d %d %d) %f" % (CLASSES[cl], top, left, right, bottom, score))
+    else:
+        print("No notes detected")
 
 
 if __name__ == '__main__':
@@ -206,7 +214,10 @@ if __name__ == '__main__':
         exit(ret)
     print('done')
 
+    print('--> Running model')
+
     while True:
+        
         # preprocessing and capturing image with cam
         ret, frame = cam.read()
         img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -214,15 +225,11 @@ if __name__ == '__main__':
         img = np.expand_dims(img, 0)
 
         # Inference
-        print('--> Running model')
         outputs = rknn_lite.inference(inputs=[img])
 
         # Show the classification results
         boxes, classes, scores = post_process(outputs)
-
-        for box, score, cl in zip(boxes, scores, classes):
-            top, left, right, bottom = [int(_b) for _b in box]
-            print("%s @ (%d %d %d %d) %f" % (CLASSES[cl], top, left, right, bottom, score))
+        print_outputs(boxes, classes, scores)
 
         # Break the loop if 'q' key is pressed
         if cv2.waitKey(1) & 0xFF == ord('q'):
