@@ -177,7 +177,7 @@ def draw(image, boxes, scores, classes):
         # print('class: {}, score: {}'.format(CLASSES[cl], score))
         # print('box coordinate left,top,right,down: [{}, {}, {}, {}]'.format(top, left, right, bottom))
 
-        cv2.rectangle(image, (left, top), (right, bottom), (255, 0, 0), 2)
+        cv2.rectangle(image, (top, left), (right, bottom), (255, 0, 0), 2)
         cv2.putText(image, '{0} {1:.2f}'.format(CLASSES[cl], score),
                     (top, left - 6),
                     cv2.FONT_HERSHEY_SIMPLEX,
@@ -246,7 +246,7 @@ if __name__ == '__main__':
         print_outputs(boxes, classes, scores)
 
         if boxes is not None:
-            draw(img, boxes, scores, classes)
+            draw(img[0], boxes, scores, classes)
             cv2.imwrite("output_image.jpg", cv2.cvtColor(img[0], cv2.COLOR_RGB2BGR))
             break
 
