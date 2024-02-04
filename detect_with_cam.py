@@ -173,8 +173,6 @@ def draw(image, boxes, scores, classes):
     
     for box, score, cl in zip(boxes, scores, classes):
         top, left, right, bottom = [int(_b) for _b in box]
-        # print('class: {}, score: {}'.format(CLASSES[cl], score))
-        # print('box coordinate left,top,right,down: [{}, {}, {}, {}]'.format(top, left, right, bottom))
 
         cv2.rectangle(image, (top, left), (right, bottom), (255, 0, 0), 2)
         cv2.putText(image, '{0} {1:.2f}'.format(CLASSES[cl], score),
@@ -186,7 +184,9 @@ def print_outputs(boxes, classes, scores):
     if boxes is not None:
         for box, score, cl in zip(boxes, scores, classes):
             top, left, right, bottom = [int(_b) for _b in box]
-            print("%s @ (%d %d %d %d) %f" % (CLASSES[cl], top, left, right, bottom, score))
+            xVal = (top + right) / 2
+            yVal = (left + bottom) / 2
+            print("%s @ (%d %d) %f" % (CLASSES[cl], (xVal, yVal, score)))
     else:
         print("No notes detected")
 
