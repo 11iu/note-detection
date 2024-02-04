@@ -1,8 +1,9 @@
+from rknnlite.api import RKNNLite
 import cv2
 import numpy as np
 import platform
 import time
-from rknnlite.api import RKNNLite
+from networktables import NetworkTable
 
 # decice tree for RK356x/RK3588
 DEVICE_COMPATIBLE_NODE = '/proc/device-tree/compatible'
@@ -192,8 +193,11 @@ def print_outputs(boxes, classes, scores):
 
 if __name__ == '__main__':
 
+    # create networktable to send coordinate data
+    nt = NetworkTable()
+
     cam = cv2.VideoCapture(0)
-    # choose codec according to format needed
+    # create video output
     fourcc = cv2.VideoWriter_fourcc(*'MP4V') 
     video = cv2.VideoWriter('video.mp4', fourcc, 24, IMG_SIZE)
     
@@ -267,6 +271,7 @@ if __name__ == '__main__':
     fps = frames / (time.time() - initTime)
     print(f"Overall fps: {fps: .3f}")
     
+    nt.close()
     cam.release()
     video.release()
     rknn_lite.release()
