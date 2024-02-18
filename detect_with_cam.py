@@ -337,6 +337,6 @@ if __name__ == '__main__':
     
     nt.close()
     cam.release()
-    video.release()
+    #video.release()
     rknn_lite.release()
     print('done')
