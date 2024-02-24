@@ -348,7 +348,7 @@ if __name__ == '__main__':
     fps = frames / (time.time() - initTime)
     # print(f"Overall fps: {fps: .3f}")
     
-    #nt.close()                   
+    nt.close()                   
     cam.release()
     #video.release()
     rknn_lite.release()
