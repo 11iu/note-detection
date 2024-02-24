@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import platform
 import time
-#from networktables import NetworkTable
+from networktables import NetworkTable
 
 # decice tree for RK356x/RK3588
 DEVICE_COMPATIBLE_NODE = '/proc/device-tree/compatible'
@@ -222,7 +222,7 @@ def location_data(boxes):
 if __name__ == '__main__':
 
     # create networktable to send coordinate data
-    #nt = NetworkTable()
+    nt = NetworkTable()
 
     cam = cv2.VideoCapture(0)
     # create video output for testing
@@ -286,6 +286,12 @@ if __name__ == '__main__':
         if detected:
             left, top, right, bottom = location_data(boxes) # middle of 2d 
 
+            # set so that the bottom is 0
+            top = 640 - top
+            bottom = 640 - bottom
+
+            #print(f"{left}, {top}, {right}, {bottom}")
+
             # clockwise from bottom left, units are inches
             object_points = np.array([
                 [0, 0, 0],
@@ -309,17 +315,16 @@ if __name__ == '__main__':
 
             if (success):
                 rmat = cv2.Rodrigues(rvec)[0] # rotation matrix
-                #camera_position = -np.dot(rmat.T, tvec)
-                camera_position = -np.matrix(rmat.T) * np.matrix(tvec)
+                note_position = -np.dot(rmat.T, tvec)
 
-                x = camera_position[0]
-                y = camera_position[1]
+                x = note_position[0]
+                y = note_position[1]
 
-                #print(f"Camera pose: {x}, {y}")
+                print(f"Note pose: {x}, {y}")
 
 
         # publish data using networktables
-        #nt.periodic(x, y, detected)
+        nt.periodic(x, y, detected)
 
         # print_outputs(boxes, classes, scores)
 
