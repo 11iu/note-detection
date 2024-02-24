@@ -19,7 +19,9 @@ class NetworkTable:
 
     def close(self):
         # stop publishing
-        self.xPublisher.close()
         self.xTopic.close()
-        self.yPublisher.close()
         self.yTopic.close()
+        self.detectedTopic.close()
+        self.xPublisher.close()
+        self.yPublisher.close()
+        self.detectedPublisher.close()
