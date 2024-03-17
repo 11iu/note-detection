@@ -184,7 +184,7 @@ def post_process(input_data):
     return boxes, classes, scores
 
 def draw(image, boxes, scores, classes):
-    
+
     for box, score, cl in zip(boxes, scores, classes):
         top, left, right, bottom = [int(_b) for _b in box]
 
@@ -215,9 +215,9 @@ def location_data(boxes):
         # find closest box to cam
         if new_bottom < bottom:
             left, top, right, bottom = new_left, new_top, new_right, new_bottom
-    
+
     return (left, top, right, bottom)
-      
+
 
 if __name__ == '__main__':
 
@@ -226,9 +226,9 @@ if __name__ == '__main__':
 
     cam = cv2.VideoCapture(0)
     # create video output for testing
-    #fourcc = cv2.VideoWriter_fourcc(*'MP4V') 
+    #fourcc = cv2.VideoWriter_fourcc(*'MP4V')
     #video = cv2.VideoWriter('video.mp4', fourcc, 24, IMG_SIZE)
-    
+
     # Get device information
     host_name = get_host()
     if host_name == 'RK3588':
@@ -281,10 +281,10 @@ if __name__ == '__main__':
         detected = boxes is not None
 
         # 2d pose of the robot, y is axis from robot towards note in front, x is side to side
-        x, y = 0, 0 
+        x, y = 0, 0
 
         if detected:
-            left, top, right, bottom = location_data(boxes) # middle of 2d 
+            left, top, right, bottom = location_data(boxes) # middle of 2d
 
             # set so that the bottom is 0
             top = 640 - top
@@ -312,7 +312,7 @@ if __name__ == '__main__':
 
             if (success):
                 rmat = cv2.Rodrigues(rvec)[0] # rotation matrix
-                
+
                 note_position = -np.dot(rmat.T, tvec)
 
                 x = note_position[0]
@@ -346,8 +346,8 @@ if __name__ == '__main__':
     # Overall average fps
     fps = frames / (time.time() - initTime)
     # print(f"Overall fps: {fps: .3f}")
-    
-    nt.close()                   
+
+    nt.close()
     cam.release()
     #video.release()
     rknn_lite.release()
